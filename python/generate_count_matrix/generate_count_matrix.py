@@ -1,7 +1,7 @@
 '''
 Description : Generate a count matrix from multiple individual count files.
 Copyright   : (c) Jessica Chung, 2017
-License     : MIT 
+License     : MIT
 Maintainer  : jchung@unimelb.edu.au
 
 This program reads in one or more input text files with expression counts
@@ -19,8 +19,7 @@ import logging
 
 PROGRAM_VERSION = "1.0"
 EXIT_FILE_IO_ERROR = 1
-EXIT_GENE_ERROR = 1
-EXIT_COUNT_ERROR = 1
+EXIT_FILE_FORMAT_ERROR = 1
 EXIT_COMMAND_LINE_ERROR = 2
 DEFAULT_GENE_COLUMN = 1
 DEFAULT_COUNT_COLUMN = 2
@@ -92,11 +91,12 @@ def parse_args():
              'zero counts')
     parser.add_argument('--version',
         action='version',
-        version='%(prog)s ' + PROGRAM_VERSION)
+        version='%(prog)s ' + PROGRAM_VERSION,
+        help="Show program's version number and exit")
     parser.add_argument('--log',
         metavar='LOG_FILE',
         type=str,
-        help='record program progress in LOG_FILE')
+        help='Record program progress in LOG_FILE')
     parser.add_argument('count_files',
         nargs='+',
         metavar='COUNT_FILE',
@@ -114,44 +114,79 @@ def process_files(options):
     Result:
        None
     '''
-    all_counts = []
+    columns = []
     header = ["gene_id"]
     for count_filename in options.count_files:
         logging.info("Processing counts from {}".format(count_filename))
+        header.append(count_filename)
         try:
-            counts_file = open(count_filename)
+            with open(count_filename) as f:
+                data = f.read().strip().split("\n")
         except IOError as exception:
             exit_with_error(str(exception), EXIT_FILE_IO_ERROR)
-        with counts_file:
-            header.append(count_filename)
-            data = counts_file.read().strip().split("\n")[options.skip_lines:]
-            data = [x.split(options.delimiter) for x in data]
-            genes, counts = list(zip(*data))
-            try:
-                # Check if integers or floats
-                if any([x.count(".") for x in counts]):
-                    counts = [float(x) for x in counts]
-                else:
-                    counts = [int(x) for x in counts]
-            except ValueError:
-                exit_with_error("Not all count values are numeric", 
-                    EXIT_COUNT_ERROR)
-            # Round counts
-            if options.round:
-                counts = [round(x) for x in counts]
-            if not all_counts:
-                all_counts.append(genes)
-            # Check if gene IDs match
-            if all_counts[0] == genes:
-                all_counts.append(counts)
-            else:
-                exit_with_error("Gene IDs are not identical", EXIT_GENE_ERROR)
-    output_rows = [list(x) for x in zip(*all_counts)]
+        # Get genes and counts
+        genes, counts = parse_counts(
+            data, gene_col=options.gene_col, count_col=options.count_col,
+            skip_lines=options.skip_lines, delimiter=options.delimiter,
+            rounding=options.round, filename=count_filename)
+        if not columns:
+            columns.append(genes)
+        # Check if gene IDs match
+        if columns[0] != genes:
+            exit_with_error("Gene IDs are not identical",
+                EXIT_FILE_FORMAT_ERROR)
+        columns.append(counts)
+    # Transpose nested list to get rows
+    output_rows = list(zip(*columns))
+    # Print matrix to stdout
     print("\t".join(header))
     for row in output_rows:
         # Only print rows with at least one count
         if options.keep_all_genes or sum(row[1:]) > 0:
             print("\t".join([str(x) for x in row]))
+
+
+def parse_counts(data, gene_col=1, count_col=2, skip_lines=0, delimiter="\t",
+        rounding=True, filename=None):
+    '''Parse input files to get gene names and counts.
+
+    Arguments:
+       data: the list containing the lines of the input file
+       gene_col: field containing the gene ID
+       count_col: field containing the counts
+       skip_lines: number of lines to skip from the start
+       delimiter: field delimiter of the file
+       filename: filename of input
+    Result:
+       Tuple containing the list of gene names and the list of counts
+    '''
+    # Remove header and split by delimiter
+    data = data[skip_lines:]
+    data = [x.split(delimiter) for x in data]
+    # Transpose nested list
+    transposed_data = list(zip(*data))
+    if not all([len(x) == len(transposed_data) for x in data]):
+        exit_with_error("Rows in {} do not have the same number of fields" \
+            "".format(filename), EXIT_FILE_FORMAT_ERROR)
+    try:
+        genes = transposed_data[gene_col - 1]
+        counts = transposed_data[count_col - 1]
+    except IndexError:
+        exit_with_error("Invalid gene or count column number in {}" \
+            "".format(filename), EXIT_FILE_FORMAT_ERROR)
+    try:
+        # Check if integers or floats and convert
+        if any([x.count(".") for x in counts]):
+            counts = [float(x) for x in counts]
+        else:
+            counts = [int(x) for x in counts]
+    except ValueError:
+        exit_with_error("Not all count values are numeric in {}" \
+            "".format(filename), EXIT_FILE_FORMAT_ERROR)
+    # Round counts
+    if rounding:
+        counts = [round(x) for x in counts]
+    return (genes, counts)
 
 
 def init_logging(log_filename):
