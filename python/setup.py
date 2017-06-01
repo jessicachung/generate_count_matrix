@@ -12,14 +12,14 @@ input count files.
 '''
 
 setup(
-    name='generate-count-matrix-py',
+    name='generate-count-matrix',
     version='0.1.0.0',
     author='Jessica Chung',
     author_email='jchung@unimelb.edu.au',
-    packages=['generate-count-matrix'],
-    package_dir={'generate-count-matrix': 'generate-count-matrix'},
+    packages=['generate_count_matrix'],
+    package_dir={'generate_count_matrix': 'generate_count_matrix'},
     entry_points={
-        'console_scripts': ['generate-count-matrix = generate-count-matrix.generate-count-matrix:main']
+        'console_scripts': ['generate-count-matrix = generate_count_matrix.generate_count_matrix:main']
     },
     url='https://github.com/jessicachung/generate-count-matrix',
     license='LICENSE',
