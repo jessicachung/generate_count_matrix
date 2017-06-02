@@ -27,7 +27,7 @@ DEFAULT_DELIMITER = "\t"
 DEFAULT_SKIP_LINES = 0
 DEFAULT_ROUNDING = False
 DEFAULT_KEEP_ALL = False
-PROGRAM_NAME = "generate-count-matrix"
+PROGRAM_NAME = "generate_count_matrix"
 
 
 def exit_with_error(message, exit_status):

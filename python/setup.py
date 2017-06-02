@@ -12,16 +12,16 @@ input count files.
 '''
 
 setup(
-    name='generate-count-matrix',
+    name='generate_count_matrix',
     version='0.1.0.0',
     author='Jessica Chung',
     author_email='jchung@unimelb.edu.au',
     packages=['generate_count_matrix'],
     package_dir={'generate_count_matrix': 'generate_count_matrix'},
     entry_points={
-        'console_scripts': ['generate-count-matrix = generate_count_matrix.generate_count_matrix:main']
+        'console_scripts': ['generate_count_matrix = generate_count_matrix.generate_count_matrix:main']
     },
-    url='https://github.com/jessicachung/generate-count-matrix',
+    url='https://github.com/jessicachung/generate_count_matrix',
     license='LICENSE',
     description=('Generate a count matrix from separate input files.'),
     long_description=(LONG_DESCRIPTION)
