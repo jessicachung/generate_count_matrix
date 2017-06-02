@@ -1,0 +1,123 @@
+<tool id="generate_count_matrix" name="Generate count matrix" version="0.1.0">
+    <description>from individual files</description>
+    <requirements>
+    </requirements>
+    <stdio>
+        <exit_code range="1:" />
+    </stdio>
+    <command><![CDATA[
+        ## Create symlinks so dataset names are used as columns names in the output
+        #for $input_file in $count_files:
+            ln -s '$input_file' '$input_file.name' &&
+        #end for
+
+        ## Run script
+        python '$__tool_directory__/python/generate_count_matrix/generate_count_matrix.py'
+            --gene-col '$gene_col'
+            --count-col '$count_col'
+            --skip-lines '$skip_lines'
+
+            #if $delimiter == "tab":
+                #pass
+            #else if $delimiter == "comma":
+                --delimiter ','
+            #else if $delimiter == "space":
+                --delimiter ' '
+            #end if
+
+            #if $round:
+                --round
+            #end if
+
+            #if $keep == "yes":
+                --keep-all-genes
+            #end if
+
+            --log matrix.log
+
+            #for $input_file in $count_files:
+                '$input_file.name'
+            #end for
+
+            > '$output'
+
+    ]]></command>
+    <inputs>
+        <param name="count_files" type="data" label="Count files from your history" format="tabular,csv,txt" multiple="true"/>
+        <param name="gene_col" type="data_column" data_ref="count_files" numerical="False" label="Column containing gene IDs"/>
+        <param name="count_col" type="data_column" data_ref="count_files" numerical="True" label="Column containing gene counts"/>
+        <param name="delimiter" type="select" label="Delimiter">
+            <option value="tab">tab</option>
+            <option value="comma">comma</option>
+            <option value="space">space</option>
+        </param>
+        <param name="skip_lines" type="integer" value="0" label="Lines to skip at start" help="Skip 1 line if the first line is a header."/>
+        <param name="keep" type="select" label="Keep all genes">
+            <option value="no">Only keep genes with at least one count</option>
+            <option value="yes">Keep all genes</option>
+        </param>
+        <param name="round" type="boolean" label="Round counts to the nearest integer"/>
+    </inputs>
+    <outputs>
+        <data name="output" format="tabular" />
+    </outputs>
+    <tests>
+        <test>
+        </test>
+    </tests>
+    <help>
+        <![CDATA[
+**What it does?**
+
+This tool takes as input multiple plain-text files containing expression counts
+(e.g. output files from HTSeq-count, featureCounts, Sailfish, and Salmon).
+The tool outputs a count matrix in a single file. Each input will have a column
+in the matrix containing its expression values.
+
+.. class:: infomark
+
+The column containing gene names should be identical for all input count files.
+
+-----
+
+**Example**
+
+To generate a matrix using three files:
+
+First file (sample_1.txt)::
+
+    gene_A	338
+    gene_B	52
+    gene_C	236
+    gene_D	0
+
+Second file (sample_2.txt)::
+
+    gene_A	353
+    gene_B	449
+    gene_C	309
+    gene_D	261
+
+Third file (sample_3.txt)::
+
+    gene_A	746
+    gene_B	52
+    gene_C	945
+    gene_D	758
+
+Generating a matrix from these three files using column 1 as the gene ID and column 2 as the counts returns::
+
+    gene_id	sample_1.txt	sample_2.txt	sample_3.txt
+    gene_A	338	353	746
+    gene_B	52	449	52
+    gene_C	236	309	945
+    gene_D	0	261	758
+
+.. class:: infomark
+
+The output of this tool is always in tabular format.
+        ]]>
+    </help>
+    <citations>
+    </citations>
+</tool>
