@@ -13,9 +13,14 @@
 
         ## Run script
         python '$__tool_directory__/python/generate_count_matrix/generate_count_matrix.py'
-            --gene-col '$gene_col'
-            --count-col '$count_col'
-            --skip-lines '$skip_lines'
+            --gene-col '$headers.gene_col'
+            --count-col '$headers.count_col'
+
+            #if $headers.skip == "specified":
+                --skip-lines '$headers.skip_lines'
+            #else if $headers.skip == "commented":
+                --skip-comments
+            #end if
 
             #if $delimiter == "tab":
                 #pass
@@ -44,14 +49,31 @@
     ]]></command>
     <inputs>
         <param name="count_files" type="data" label="Count files from your history" format="tabular,csv,txt" multiple="true"/>
-        <param name="gene_col" type="data_column" data_ref="count_files" numerical="False" label="Column containing gene IDs"/>
-        <param name="count_col" type="data_column" data_ref="count_files" numerical="True" label="Column containing gene counts"/>
+        <conditional name="headers">
+            <param name="skip" type="select" label="Are there header lines to skip at the beginning of the file?">
+                <option value="no">No lines to skip</option>
+                <option value="specified">Skip a specified number of lines</option>
+                <option value="commented">Remove header lines beginning with '#'</option>
+            </param>
+            <when value="no">
+                <param name="gene_col" type="data_column" data_ref="count_files" numerical="False" label="Column containing gene IDs"/>
+                <param name="count_col" type="data_column" data_ref="count_files" numerical="True" label="Column containing gene counts"/>
+            </when>
+            <when value="specified">
+                <param name="skip_lines" type="integer" value="1" label="Lines to skip at start" help="Skip 1 line if the first line is a header."/>
+                <param name="gene_col" type="integer" value="1" label="Column containing gene IDs"/>
+                <param name="count_col" type="integer" value="2" label="Column containing gene counts"/>
+            </when>
+            <when value="commented">
+                <param name="gene_col" type="integer" value="1" label="Column containing gene IDs"/>
+                <param name="count_col" type="integer" value="2" label="Column containing gene counts"/>
+            </when>
+        </conditional>
         <param name="delimiter" type="select" label="Delimiter">
             <option value="tab">tab</option>
             <option value="comma">comma</option>
             <option value="space">space</option>
         </param>
-        <param name="skip_lines" type="integer" value="0" label="Lines to skip at start" help="Skip 1 line if the first line is a header."/>
         <param name="keep" type="select" label="Keep all genes">
             <option value="no">Only keep genes with at least one count</option>
             <option value="yes">Keep all genes</option>
