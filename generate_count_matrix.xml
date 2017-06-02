@@ -56,13 +56,31 @@
             <option value="no">Only keep genes with at least one count</option>
             <option value="yes">Keep all genes</option>
         </param>
-        <param name="round" type="boolean" label="Round counts to the nearest integer"/>
+        <param name="round" type="boolean" checked="true" label="Round counts to the nearest integer"/>
     </inputs>
     <outputs>
         <data name="output" format="tabular" />
     </outputs>
     <tests>
         <test>
+            <param name="count_files" value="counts_condition_1_A.txt,counts_condition_1_B.txt,counts_condition_1_C.txt,counts_condition_2_A.txt,counts_condition_2_B.txt,counts_condition_2_C.txt"/>
+            <param name="gene_col" value="1" />
+            <param name="count_col" value="2" />
+            <param name="delimiter" value="tab" />
+            <param name="skip_lines" value="0" />
+            <param name="keep" value="no" />
+            <param name="round" value="true" />
+            <output name="output" file="output_counts.txt"/>
+        </test>
+        <test>
+            <param name="count_files" value="estimates_condition_1_A.txt,estimates_condition_1_B.txt,estimates_condition_1_C.txt,estimates_condition_2_A.txt,estimates_condition_2_B.txt,estimates_condition_2_C.txt"/>
+            <param name="gene_col" value="2" />
+            <param name="count_col" value="5" />
+            <param name="delimiter" value="comma" />
+            <param name="skip_lines" value="3" />
+            <param name="keep" value="yes" />
+            <param name="round" value="true" />
+            <output name="output" file="output_estimates.txt"/>
         </test>
     </tests>
     <help>
