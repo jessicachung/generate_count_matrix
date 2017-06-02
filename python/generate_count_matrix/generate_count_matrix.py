@@ -185,7 +185,7 @@ def parse_counts(data, gene_col=1, count_col=2, skip_lines=0, delimiter="\t",
             "".format(filename), EXIT_FILE_FORMAT_ERROR)
     # Round counts
     if rounding:
-        counts = [round(x) for x in counts]
+        counts = [int(round(x)) for x in counts]
     return (genes, counts)
 
 
