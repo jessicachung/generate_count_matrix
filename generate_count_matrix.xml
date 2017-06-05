@@ -1,4 +1,4 @@
-<tool id="generate_count_matrix" name="Generate count matrix" version="0.1.0">
+<tool id="generate_count_matrix" name="Generate count matrix" version="1.0">
     <description>from individual files</description>
     <requirements>
     </requirements>
