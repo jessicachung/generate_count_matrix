@@ -13,8 +13,8 @@
 
         ## Run script
         python '$__tool_directory__/python/generate_count_matrix/generate_count_matrix.py'
-            --gene-col '$headers.gene_col'
-            --count-col '$headers.count_col'
+            --gene-col '$gene_col'
+            --count-col '$count_col'
 
             #if $headers.skip == "specified":
                 --skip-lines '$headers.skip_lines'
@@ -49,24 +49,16 @@
     ]]></command>
     <inputs>
         <param name="count_files" type="data" label="Count files from your history" format="tabular,csv,txt" multiple="true"/>
+        <param name="gene_col" type="integer" value="1" label="Column containing gene IDs"/>
+        <param name="count_col" type="integer" value="2" label="Column containing gene counts"/>
         <conditional name="headers">
             <param name="skip" type="select" label="Are there header lines to skip at the beginning of the file?">
                 <option value="no">No lines to skip</option>
                 <option value="specified">Skip a specified number of lines</option>
                 <option value="commented">Remove header lines beginning with '#'</option>
             </param>
-            <when value="no">
-                <param name="gene_col" type="data_column" data_ref="count_files" numerical="False" label="Column containing gene IDs"/>
-                <param name="count_col" type="data_column" data_ref="count_files" numerical="True" label="Column containing gene counts"/>
-            </when>
             <when value="specified">
                 <param name="skip_lines" type="integer" value="1" label="Lines to skip at start" help="Skip 1 line if the first line is a header."/>
-                <param name="gene_col" type="integer" value="1" label="Column containing gene IDs"/>
-                <param name="count_col" type="integer" value="2" label="Column containing gene counts"/>
-            </when>
-            <when value="commented">
-                <param name="gene_col" type="integer" value="1" label="Column containing gene IDs"/>
-                <param name="count_col" type="integer" value="2" label="Column containing gene counts"/>
             </when>
         </conditional>
         <param name="delimiter" type="select" label="Delimiter">
@@ -81,27 +73,27 @@
         <param name="round" type="boolean" checked="true" label="Round counts to the nearest integer"/>
     </inputs>
     <outputs>
-        <data name="output" format="tabular" />
+        <data name="output" format="tabular"/>
     </outputs>
     <tests>
         <test>
             <param name="count_files" value="counts_condition_1_A.txt,counts_condition_1_B.txt,counts_condition_1_C.txt,counts_condition_2_A.txt,counts_condition_2_B.txt,counts_condition_2_C.txt"/>
-            <param name="gene_col" value="1" />
-            <param name="count_col" value="2" />
-            <param name="delimiter" value="tab" />
-            <param name="skip_lines" value="0" />
-            <param name="keep" value="no" />
-            <param name="round" value="true" />
+            <param name="gene_col" value="1"/>
+            <param name="count_col" value="2"/>
+            <param name="delimiter" value="tab"/>
+            <param name="skip_lines" value="0"/>
+            <param name="keep" value="no"/>
+            <param name="round" value="true"/>
             <output name="output" file="output_counts.txt"/>
         </test>
         <test>
             <param name="count_files" value="estimates_condition_1_A.txt,estimates_condition_1_B.txt,estimates_condition_1_C.txt,estimates_condition_2_A.txt,estimates_condition_2_B.txt,estimates_condition_2_C.txt"/>
-            <param name="gene_col" value="2" />
-            <param name="count_col" value="5" />
-            <param name="delimiter" value="comma" />
-            <param name="skip_lines" value="3" />
-            <param name="keep" value="yes" />
-            <param name="round" value="true" />
+            <param name="gene_col" value="2"/>
+            <param name="count_col" value="5"/>
+            <param name="delimiter" value="comma"/>
+            <param name="skip_lines" value="3"/>
+            <param name="keep" value="yes"/>
+            <param name="round" value="true"/>
             <output name="output" file="output_estimates.txt"/>
         </test>
     </tests>
@@ -117,6 +109,7 @@ in the matrix containing its expression values.
 .. class:: infomark
 
 The column containing gene names should be identical for all input count files.
+The name of each input dataset must be different.
 
 -----
 
@@ -153,9 +146,7 @@ Generating a matrix from these three files using column 1 as the gene ID and col
     gene_C	236	309	945
     gene_D	0	261	758
 
-.. class:: infomark
-
-The output of this tool is always in tabular format.
+**Note:** The output of this tool is always in tabular format.
         ]]>
     </help>
     <citations>
