@@ -6,6 +6,16 @@
         <exit_code range="1:" />
     </stdio>
     <command><![CDATA[
+        ## Check dataset names are unique
+        #for $input_file in $count_files:
+            echo '$input_file.name' >> filenames.txt;
+        #end for
+        diff <(sort filenames.txt) <(sort filenames.txt | uniq) > /dev/null;
+        if [ $? -ne 0 ]; then
+            echo "ERROR: Names of Galaxy input datasets must be unique.";
+            exit 1;
+        fi;
+
         ## Create symlinks so dataset names are used as columns names in the output
         #for $input_file in $count_files:
             ln -s '$input_file' '$input_file.name' &&
