@@ -91,7 +91,6 @@
             <param name="gene_col" value="1"/>
             <param name="count_col" value="2"/>
             <param name="delimiter" value="tab"/>
-            <param name="skip_lines" value="0"/>
             <param name="keep" value="no"/>
             <param name="round" value="true"/>
             <output name="output" file="output_counts.txt"/>
@@ -101,6 +100,7 @@
             <param name="gene_col" value="2"/>
             <param name="count_col" value="5"/>
             <param name="delimiter" value="comma"/>
+            <param name="skip" value="specified"/>
             <param name="skip_lines" value="3"/>
             <param name="keep" value="yes"/>
             <param name="round" value="true"/>
