@@ -25,6 +25,7 @@ DEFAULT_GENE_COLUMN = 1
 DEFAULT_COUNT_COLUMN = 2
 DEFAULT_DELIMITER = "\t"
 DEFAULT_SKIP_LINES = 0
+DEFAULT_SKIP_COMMENTS = False
 DEFAULT_ROUNDING = False
 DEFAULT_KEEP_ALL = False
 PROGRAM_NAME = "generate_count_matrix"
@@ -65,6 +66,13 @@ def parse_args():
         default=DEFAULT_COUNT_COLUMN,
         help='field containing counts (default {})'.format(
             DEFAULT_COUNT_COLUMN))
+    parser.add_argument(
+        '--skip-comments',
+        action='store_true',
+        default=DEFAULT_SKIP_COMMENTS,
+        help="skip all lines beginning with the '#' character " \
+             "(if used with --skip-lines, comment lines will be removed " \
+             "before removing the specified number of lines)")
     parser.add_argument(
         '--skip-lines',
         metavar='N',
@@ -126,9 +134,14 @@ def process_files(options):
             exit_with_error(str(exception), EXIT_FILE_IO_ERROR)
         # Get genes and counts
         genes, counts = parse_counts(
-            data, gene_col=options.gene_col, count_col=options.count_col,
-            skip_lines=options.skip_lines, delimiter=options.delimiter,
-            rounding=options.round, filename=count_filename)
+            data,
+            gene_col=options.gene_col,
+            count_col=options.count_col,
+            skip_comments=options.skip_comments,
+            skip_lines=options.skip_lines,
+            delimiter=options.delimiter,
+            rounding=options.round,
+            filename=count_filename)
         if not columns:
             columns.append(genes)
         # Check if gene IDs match
@@ -146,20 +159,25 @@ def process_files(options):
             print("\t".join([str(x) for x in row]))
 
 
-def parse_counts(data, gene_col=1, count_col=2, skip_lines=0, delimiter="\t",
-        rounding=True, filename=None):
+def parse_counts(data, gene_col=1, count_col=2, skip_comments=False,
+        skip_lines=0, delimiter="\t", rounding=False, filename=None):
     '''Parse input files to get gene names and counts.
 
     Arguments:
        data: the list containing the lines of the input file
        gene_col: field containing the gene ID
        count_col: field containing the counts
+       skip_comments: skip lines beginning with the '#' character
        skip_lines: number of lines to skip from the start
        delimiter: field delimiter of the file
        filename: filename of input
     Result:
        Tuple containing the list of gene names and the list of counts
     '''
+    # Remove empty lines and comment lines
+    data = [line for line in data if len(line) > 0]
+    if skip_comments:
+        data = [line for line in data if line[0] != '#']
     # Remove header and split by delimiter
     data = data[skip_lines:]
     data = [x.split(delimiter) for x in data]
