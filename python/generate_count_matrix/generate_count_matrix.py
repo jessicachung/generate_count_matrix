@@ -56,52 +56,52 @@ def parse_args():
         metavar='N',
         type=int,
         default=DEFAULT_GENE_COLUMN,
-        help='Field containing gene IDs (default {})'.format(
+        help='field containing gene IDs (default {})'.format(
             DEFAULT_GENE_COLUMN))
     parser.add_argument(
         '--count-col',
         metavar='N',
         type=int,
         default=DEFAULT_COUNT_COLUMN,
-        help='Field containing counts (default {})'.format(
+        help='field containing counts (default {})'.format(
             DEFAULT_COUNT_COLUMN))
     parser.add_argument(
         '--skip-lines',
         metavar='N',
         type=int,
         default=DEFAULT_SKIP_LINES,
-        help='Number of heading lines to skip (default {})'.format(
+        help='number of heading lines to skip (default {})'.format(
             DEFAULT_SKIP_LINES))
     parser.add_argument(
         '--delimiter',
         metavar='DELIM',
         type=str,
         default=DEFAULT_DELIMITER,
-        help='Use DELIM instead of TAB for field delimiter')
+        help='use DELIM instead of TAB for field delimiter')
     parser.add_argument(
         '--round',
         action='store_true',
         default=DEFAULT_ROUNDING,
-        help='Round count values to the nearest integer')
+        help='round count values to the nearest integer')
     parser.add_argument(
         '--keep-all-genes',
         action='store_true',
         default=DEFAULT_KEEP_ALL,
-        help='Keep all genes in final matrix instead of removing genes with ' \
+        help='keep all genes in final matrix instead of removing genes with ' \
              'zero counts')
     parser.add_argument('--version',
         action='version',
         version='%(prog)s ' + PROGRAM_VERSION,
-        help="Show program's version number and exit")
+        help="show program's version number and exit")
     parser.add_argument('--log',
         metavar='LOG_FILE',
         type=str,
-        help='Record program progress in LOG_FILE')
+        help='record program progress in LOG_FILE')
     parser.add_argument('count_files',
         nargs='+',
         metavar='COUNT_FILE',
         type=str,
-        help='Input plain-text count files')
+        help='input plain-text count files')
     return parser.parse_args()
 
 
